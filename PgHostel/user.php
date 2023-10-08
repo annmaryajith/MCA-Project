@@ -11,7 +11,7 @@
     <body>
         <h1>USER<h1>
             <a href="useredit.php">Edit </a>
-            <a href="userdelete.php">Delete </a>
+            <!-- <a href="userdelete.php">Delete </a> -->
         
         <script src="" async defer></script>
     </body>
