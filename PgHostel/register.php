@@ -61,19 +61,19 @@ $conn->close();
           <span id="name-error" class="error"></span>
         </div>
         <div class="input-box">
-          <input type="email" name="email" placeholder="Enter your email" required>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required>
           <span id="email-error" class="error"></span>
         </div>
         <div class="input-box">
-          <input type="text" name="phno" placeholder="Enter your phone number" required>
+          <input type="text" id="phno" name="phno" placeholder="Enter your phone number" required>
           <span id="phno-error" class="error"></span>
         </div>
         <div class="input-box">
-          <input type="text" name="username" placeholder="Enter your username" required>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required>
           <span id="username-error" class="error"></span>
         </div>
         <div class="input-box">
-          <input type="password" name="password" placeholder="Enter your password" required>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
           <span id="password-error" class="error"></span>
         </div>
        <!-- <div class="role-field">
