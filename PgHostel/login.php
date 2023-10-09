@@ -63,14 +63,14 @@ $conn->close();
             <form action="" method="POST" id="login-form">
                <div class="field">
                   <span class="fa fa-user"></span>
-                  <input type="text" class="username" name="username" required placeholder="Username">
-                   <span id="username-error" class="error"></span>
+                  <input type="text" class="username" name="username" id="username" required placeholder="Username">
+                   <div id="username-error" class="error"></div>
                </div>
                <div class="field space">
                   <span class="fa fa-lock"></span>
-                  <input type="password" class="password" name="password" required placeholder="Password">
-                  <span id="password-error" class="error"></span>
-                  <span class="show">SHOW</span>
+                  <input type="password" class="password" name="password" id="password" required placeholder="Password">
+                  <div id="password-error" class="error"></div>
+                  <!-- <span class="show">SHOW</span> -->
                </div>
                <div class="pass">
                   <a href="#">Forgot Password?</a>
@@ -86,7 +86,51 @@ $conn->close();
             </div>
          </div>
       </div>
-      <script src="js/jsindex.js"></script>
+      <script>
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const usernameError = document.getElementById("username-error");
+    const passwordError = document.getElementById("password-error");
+    const submitButton = document.getElementById("submit-button");
+
+    // Add event listeners for input fields
+    usernameInput.addEventListener("input", validateUsername);
+    passwordInput.addEventListener("input", validatePassword);
+
+    // Function to validate the username
+    function validateUsername() {
+        const usernameValue = usernameInput.value;
+        if (usernameValue.length < 3) {
+            usernameError.textContent = "Username must be at least 2 characters long";
+            usernameError.style.color = "red";
+        } else {
+            usernameError.textContent = "";
+        }
+    }
+
+    // Function to validate the password
+    function validatePassword() {
+        const passwordValue = passwordInput.value;
+        if (passwordValue.length < 5) {
+            passwordError.textContent = "Password must be at least 5 characters long";
+            passwordError.style.color = "red";
+        } else {
+            passwordError.textContent = "";
+        }
+    }
+
+    // Add form submission event listener
+    submitButton.addEventListener("click", function (event) {
+        // Validate both fields before submitting the form
+        validateUsername();
+        validatePassword();
+
+        // Prevent form submission if there are validation errors
+        if (usernameError.textContent || passwordError.textContent) {
+            event.preventDefault();
+        }
+    });
+    </script>
 
       
    </body>
