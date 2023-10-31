@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -72,27 +71,49 @@
             background-color: #3949ab;
             font-weight: bold;
         }
-
-
-
+         
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="sidebar">
+<div class="container">
+    <div class="sidebar">
         <h2>Admin Dashboard</h2>
         <ul>
             <li><a href="userview.php">Users</a></li>
             <li><a href="#pg">PG</a></li>
-            <li><a href="#hostel">Hostel</a></li>
-            <li><a href="logout.php" class="logout">Logout</a>  </li>
+            <li>
+                <a href="javascript:void(0);" onclick="toggleHostelSubmenu()">Hostel</a>
+                <div class="sub-options" style="display: none;">
+                    <ul>
+                        <li><a href="viewhostel.php">View Hostel</a></li>
+                        <li><a href="addhostel.php">Add Hostel</a></li>
+                    </ul>
+                </div>
+                </li>
+            <li><a href="logout.php" class="logout">Logout</a></li>
+        </ul>
+    </div>
+</div>
+<script>
+    function toggleHostelSubmenu() {
+        var subOptions = document.querySelector(".sub-options");
+        if (subOptions.style.display === "none" || subOptions.style.display === "") {
+            subOptions.style.display = "block";
+        } else {
+            subOptions.style.display = "none";
+        }
+    }
+</script>
+
+
+        <li><a href="logout.php" class="logout">Logout</a></li>
         </ul>
         </div>
 
         <div class="content">
             <h2>Welcome, Admin!</h2>
-            <!-- Content for each section (Customers, Staff, Medicine) goes here -->
+          
         </div>
         <a href="logout.php" class="logout">Logout</a>   
         </table>
