@@ -3,8 +3,19 @@ include('conn.php'); // Include your database connection code
 
 $errorMessage = ""; // Initialize an error message variable
 
+$pgNamesQuery = "SELECT DISTINCT pg_name FROM pg"; // Modify this query based on your database structure
+$result1 = $conn->query($pgNamesQuery);
+
+$pgNames = array(); // Create an array to store PG names
+
+if ($result1->num_rows > 0) {
+    while ($row = $result1->fetch_assoc()) {
+        $pgNames[] = $row['pg_name'];
+    }
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
-    $hostelname = $_POST["hostelname"];
+    $pgname = $_POST["pgname"];
     $username = $_POST["username"];
     $password = $_POST["password"]; // You should hash the password for security
 
@@ -23,12 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
 
         if ($conn->query($insertLoginQuery) === TRUE) {
             // Insert data into the 'hostel_owners' table
-            $insertOwnerQuery = "INSERT INTO hostel_owners (hostel_owner,hostel_name, username,password) VALUES ('$hostelname','$hostelname', '$username','$password')";
+            $insertOwnerQuery = "INSERT INTO pg_owners (pg_owner, pg_name, username, password) VALUES ('$pgname', '$pgname', '$username','$password')";
             
             if ($conn->query($insertOwnerQuery) === TRUE) {
-                echo "Hostel owner created successfully!";
+                echo '<script>alert("Hostel owner added successfully!");</script>';
             } else {
-                echo "Error inserting data into 'hostel_owners' table: " . $conn->error;
+                echo "Error inserting data into 'pg_owners' table: " . $conn->error;
             }
         } else {
             echo "Error inserting data into 'login' table: " . $conn->error;
@@ -36,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
     }
 }
 ?>
-
 
 
 <!DOCTYPE html>
@@ -52,14 +62,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
         }
 
         .sidebar {
-    height: 100vh;
-    width: 300px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: black; /* Change to black background color */
-    padding-top: 20px;
-}
+            height: 100vh;
+            width: 300px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: black; /* Change to black background color */
+            padding-top: 20px;
+        }
+        
 
 
         .sidebar h2 {
@@ -86,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
         }
 
         ul li a:hover {
-            background-color: black; /* Slightly lighter blue for hover effect */
+            background-color: black; 
         }
 
         .content {
@@ -109,7 +120,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
             background-color: #3949ab;
             font-weight: bold;
         }
+        
+        .sub-options {
+        margin-left: 10px; /* Adjust the margin to move it to the right */
+        padding: 10px; /* Add padding for spacing */
+        }
 
+        .sidebar {
+        width: 250px; /* Set the width of the sidebar */
+        height: 100%; /* Set the fixed height for the sidebar */
+        overflow-y: auto; /* Enable vertical scrolling if content overflows */
+        position: fixed; /* Fixed position to keep the sidebar in view */
+        background-color: #000; /* Change the background color to black */
+        color: #fff;
+    }
 
 
     </style>
@@ -120,12 +144,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
     <div class="sidebar">
         <h2>Admin Dashboard</h2>
         <ul>
-            
             <li><a href="admin.php">Home</a></li>
             <li><a href="userview.php">Users</a></li>
             <li>
-                <a href="javascript:void(0);" onclick="toggleHostelSubmenu()">Pg</a>
-                <div class="sub-options" style="display: none;">
+                <a href="javascript:void(0);" onclick="toggleSubmenu('pgSubmenu')">Pg</a>
+                <div id="pgSubmenu" class="sub-options" style="display: none;">
                     <ul>
                         <li><a href="viewpg.php">View Pg</a></li>
                         <li><a href="addpg.php">Add Pg</a></li>
@@ -133,13 +156,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
                         <li><a href="addpgowner.php">Add Owner</a></li>
                     </ul>
                 </div>
-                </li>
+            </li>
             <li>
-                <a href="javascript:void(0);" onclick="toggleHostelSubmenu()">Hostel</a>
-                <div class="sub-options" style="display: none;">
+                <a href="javascript:void(0);" onclick="toggleSubmenu('hostelSubmenu')">Hostel</a>
+                <div id="hostelSubmenu" class="sub-options" style="display: none;">
                     <ul>
                         <li><a href="viewhostel.php">View Hostel</a></li>
                         <li><a href="addhostel.php">Add Hostel</a></li>
+                        <li><a href="viewowner.php">View Owner</a></li>
                         <li><a href="addowner.php">Add Owner</a></li>
                     </ul>
                 </div>
@@ -150,12 +174,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
 </div>
 
 <script>
-    function toggleHostelSubmenu() {
-        var subOptions = document.querySelector(".sub-options");
-        if (subOptions.style.display === "none" || subOptions.style.display === "") {
-            subOptions.style.display = "block";
+    function toggleSubmenu(submenuId) {
+        var submenu = document.getElementById(submenuId);
+        if (submenu.style.display === "none" || submenu.style.display === "") {
+            submenu.style.display = "block";
         } else {
-            subOptions.style.display = "none";
+            submenu.style.display = "none";
         }
     }
 </script>
@@ -227,8 +251,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
     <h2>Add Pg Owner</h2>
     <form action="" method="POST" id="createOwnerForm">
     <label for="hostelname">Pg name:</label>
-    <input type="text" name="hostelname" id="hostelname" required>
-    <span id="hostelnameError" class="error"></span>
+    <input type="text" name="pgname" id="pgname" list="pgNames" required>
+    <datalist id="pgNames">
+    <!-- Display available PG names as options in the input field -->
+    <?php foreach ($pgNames as $pg) : ?>
+        <option value="<?= $pg ?>">
+    <?php endforeach; ?>
+    </datalist>
+    <span id="pgnameError" class="error"></span>
 
     <label for="username">Username:</label>
     <input type="text" name="username" id="username" required>
@@ -243,25 +273,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
 
 <script>
     const createOwnerForm = document.getElementById("createOwnerForm");
-    const hostelname = document.getElementById("hostelname");
+    const pgname = document.getElementById("pgname");
     const username = document.getElementById("username");
     const password = document.getElementById("password");
-    const hostelnameError = document.getElementById("hostelnameError");
+    const pgnameError = document.getElementById("pgnameError");
     const usernameError = document.getElementById("usernameError");
     const passwordError = document.getElementById("passwordError");
 
-    hostelname.addEventListener("input", validateHostelName);
+    pgname.addEventListener("input", validatePgName);
     username.addEventListener("input", validateUsername);
     password.addEventListener("input", validatePassword);
 
-    function validateHostelName() {
-        const hostelnameValue = hostelname.value.trim();
+    function validatePgName() {
+        const hostelnameValue = pgname.value.trim();
         if (hostelnameValue === "") {
-            hostelnameError.textContent = "Hostel name is required.";
+            pgnameError.textContent = "Hostel name is required.";
         } else if (hostelnameValue.length < 5) {
-            hostelnameError.textContent = "Hostel name must be at least 5 characters.";
+            pgnameError.textContent = "Hostel name must be at least 5 characters.";
         } else {
-            hostelnameError.textContent = "";
+            pgnameError.textContent = "";
         }
     }
 
@@ -288,12 +318,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
     }
 
     createOwnerForm.addEventListener("submit", function (event) {
-        validateHostelName();
+        validatePgName();
         validateUsername();
         validatePassword();
 
         if (
-            hostelnameError.textContent !== "" ||
+            pgnameError.textContent !== "" ||
             usernameError.textContent !== "" ||
             passwordError.textContent !== ""
         ) {
@@ -301,6 +331,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_owner"])) {
         }
     });
 </script>
-
 </body>
 </html>
