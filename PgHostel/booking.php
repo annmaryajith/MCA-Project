@@ -1,66 +1,81 @@
 <?php
 session_start();
-include('conn.php'); // Include your database connection code
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["book"])) {
-    $hostelId = $_POST["hostel_id"]; // Get the selected hostel's ID
-    $checkInDate = $_POST["check_in_date"];
-    $checkOutDate = $_POST["check_out_date"];
-    $userId = $_SESSION['user_id']; // Assume you have a user ID in the session
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php"); // Redirect to the login page if not logged in
+    exit();
+}
 
-    // Perform validation and additional checks if needed
+// Include your database connection file
+include('conn.php');
 
-    // Check if the selected dates are available
-    $availabilityCheck = "SELECT * FROM bookings WHERE hostel_id = $hostelId 
-                          AND ((check_in_date <= '$checkInDate' AND check_out_date >= '$checkInDate') 
-                          OR (check_in_date <= '$checkOutDate' AND check_out_date >= '$checkOutDate'))";
-    $result = $conn->query($availabilityCheck);
+// Retrieve user details from the session
+$username = $_SESSION['username'];
 
-    if ($result->num_rows > 0) {
-        echo "The selected dates are not available for booking. Please choose different dates.";
+// Retrieve booking details from the form
+// $pg_name = mysqli_real_escape_string($conn, $_POST['pg_name']);
+// $room_type = mysqli_real_escape_string($conn, $_POST['room_type']);
+// $check_in = $_POST['check_in'];
+// $check_out = $_POST['check_out'];
+
+// Add additional fields as needed
+
+
+if (isset($_POST['check_in'])) {
+    $check_in = $_POST['check_in'];
+
+// Get user_id using the username
+$user_query = "SELECT user_id FROM users WHERE username = '$username'";
+$user_result = $conn->query($user_query);
+
+if ($user_result->num_rows == 1) {
+    $user_data = $user_result->fetch_assoc();
+    $user_id = $user_data['user_id'];
+
+    // Insert the booking into the database
+    $insert_query = "INSERT INTO bookings (user_id,  booking_date) 
+                     VALUES ('$user_id', '$check_in')";
+
+    if ($conn->query($insert_query) === TRUE) {
+        echo '<script>alert("Booking successful!");</script>';
     } else {
-        // Dates are available, proceed with booking
-        $insertBooking = "INSERT INTO bookings (user_id, hostel_id, check_in_date, check_out_date) 
-                          VALUES ($userId, $hostelId, '$checkInDate', '$checkOutDate')";
-
-        if ($conn->query($insertBooking) === TRUE) {
-            echo "Hostel booked successfully!";
-        } else {
-            echo "Error: " . $insertBooking . "<br>" . $conn->error;
-        }
+        echo "Error: " . $insert_query . "<br>" . $conn->error;
     }
 }
+}
+    // Redirect to a confirmation page
+//     header("Location: booking_confirmation.php");
+//     exit();
+// } else {
+//     echo "Error: User not found";
+// }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hostel Booking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PG Booking</title>
 </head>
 <body>
-    <h2>Hostel Booking</h2>
-    <form action="" method="POST">
-        <!-- Add input fields for selecting hostel, check-in, check-out dates, etc. -->
-        <label for="hostel">Select a Hostel:</label>
-        <select name="hostel_id" id="hostel">
-            <!-- Populate options dynamically from the database -->
-            <?php
-            $hostelsQuery = "SELECT * FROM hostels";
-            $result = $conn->query($hostelsQuery);
-            while ($row = $result->fetch_assoc()) {
-                echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-            }
-            ?>
-        </select>
+    <h2>PG Booking Form</h2>
+    <form action="booking.php" method="post">   
 
-        <label for="check-in">Check-in Date:</label>
-        <input type="date" name="check_in_date" id="check-in" required>
+        <!-- <label for="room_type">Room Type:</label>
+        <select id="room_type" name="room_type" required>
+            <option value="single">Single Room</option>
+            <option value="double">Double Room</option>
+            <option value="shared">Shared Room</option>
+        </select> -->
 
-        <label for="check-out">Check-out Date:</label>
-        <input type="date" name="check_out_date" id="check-out" required>
-
-        <input type="submit" name="book" value="Book Hostel">
+        <label for="check_in">Booking Date:</label>
+        <input type="date" id="check_in" name="check_in" value="<?php echo date('Y-m-d'); ?>" required>
+        
+        <input type="submit" value="Book Now">
     </form>
 </body>
 </html>
+
