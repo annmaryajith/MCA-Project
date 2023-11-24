@@ -19,7 +19,18 @@ $username = $_SESSION['username'];
 // $check_in = $_POST['check_in'];
 // $check_out = $_POST['check_out'];
 
-// Add additional fields as needed
+// Fetch the PG details from the database
+$pg_query = "SELECT pg_id, pg_name FROM pg WHERE pg_name = 'Your_Pg_Name'";
+$pg_result = $conn->query($pg_query);
+// Check if the PG is available
+if ($pg_result->num_rows == 1) {
+    $pg_data = $pg_result->fetch_assoc();
+    $selected_pg_id = $pg_data['pg_id'];
+} else {
+    // Handle the case when the PG is not found
+    echo "PG not found.";
+    exit();
+}
 
 
 if (isset($_POST['check_in'])) {
@@ -45,11 +56,8 @@ if ($user_result->num_rows == 1) {
 }
 }
     // Redirect to a confirmation page
-//     header("Location: booking_confirmation.php");
-//     exit();
-// } else {
-//     echo "Error: User not found";
-// }
+    // header("Location: booking.php");
+    // exit();
 ?>
 
 
@@ -71,6 +79,7 @@ if ($user_result->num_rows == 1) {
             <option value="shared">Shared Room</option>
         </select> -->
 
+        <input type="hidden" name="selected_pg" value="<?php echo $selected_pg_id; ?>">
         <label for="check_in">Booking Date:</label>
         <input type="date" id="check_in" name="check_in" value="<?php echo date('Y-m-d'); ?>" required>
         
