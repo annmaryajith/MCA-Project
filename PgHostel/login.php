@@ -1,6 +1,8 @@
  <?php
 include('conn.php');
 
+session_start();
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -11,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $hashed_password = md5($password);
 
-    // Check if the user is a client
+    // Check if the user is a user
     $sql_user = "SELECT * FROM users WHERE username='$username' AND password='$password'";
     $result_user = $conn->query($sql_user);
 
@@ -20,11 +22,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($result_user->num_rows > 0) {
-        // login successful
-        echo "Login successful.";
-        header('Location: user.php');
-        exit();
+        $user_row = $result_user->fetch_assoc();
+        $user_status = $user_row['status']; // Get the user's status from the database
+    
+        if ($user_status == 1) {
+            // User's status is '1' (active), so allow login
+            $_SESSION['username'] = $username;
+            header('Location: userhome.php');
+            exit();
+        } else {
+            // User's status is '0' (inactive), so block login
+            echo '<script>alert("Login is blocked for this user. Please contact the administrator.");</script>';
+        }
+    } else {
+
+        echo "Invalid username or password.";
     }
+    
 
     // Check if the user is an admin
     $sql_admin = "SELECT * FROM admin WHERE username='$username' AND password='$password'";
@@ -36,13 +50,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result_admin->num_rows > 0) {
         // Admin login successful
-        echo "Admin login successful.";
+        $_SESSION['username'] = $username;
         header('Location: admin.php');
         exit();
     }
 
-    // If neither client nor admin, display an error message
-    echo "Invalid username or password. <a href='login.php'>Go back</a>";
+      // Check if the user is an owner
+      $sql_owner = "SELECT * FROM hostel_owners1 WHERE username='$username' AND password='$password'";
+      $result_owner = $conn->query($sql_owner);
+  
+      if (!$result_owner) {
+          die("SQL query failed: " . $conn->error);
+      }
+  
+      if ($result_owner->num_rows > 0) {
+          // login successful
+          $_SESSION['username'] = $username;
+          header('Location: addhostelroom.php');
+          exit();
+      }
+
+      $sql_powner = "SELECT * FROM pg_owners WHERE username='$username' AND password='$password'";
+      $result_powner = $conn->query($sql_powner);
+  
+      if (!$result_powner) {
+          die("SQL query failed: " . $conn->error);
+      }
+  
+      if ($result_powner->num_rows > 0) {
+          // login successful
+          $_SESSION['username'] = $username;
+          header('Location: pg_owner_dashboard.php');
+          exit();
+      }
+
+    // echo "Invalid username or password. <a href='login.php'>Go back</a>";
 }
 
 $conn->close();
@@ -73,7 +115,7 @@ $conn->close();
                   <!-- <span class="show">SHOW</span> -->
                </div>
                <div class="pass">
-                  <a href="#">Forgot Password?</a>
+                  <a href="forgot-password.php">Forgot Password?</a>
                </div>
                <div class="field">
                   <input name="submit" type="submit" value="LOGIN">
@@ -86,7 +128,7 @@ $conn->close();
             </div>
          </div>
       </div>
-      <script>
+      <!-- <script>
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
     const usernameError = document.getElementById("username-error");
@@ -130,7 +172,7 @@ $conn->close();
             event.preventDefault();
         }
     });
-    </script>
+    </script> -->
 
       
    </body>
