@@ -44,11 +44,12 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <h2>PG Owner Dashboard</h2>
+            <h2>   PHMS | Owner</h2>
             <ul>
                 <li><a href="pg_owner_dashboard.php">Home</a></li>
                 <li><a href="addpgroom.php">Add Rooms</a></li>
-                <li><a href="pgownerupdate.php">Update</a></li>
+                <li><a href="viewpgroom.php">View room</a></li>
+                <li><a href="pgownerupdate.php">Update profile</a></li>
                 <!-- <li><a href="manage_tenants.php">Manage Tenants</a></li>
                 <li><a href="reports.php">Reports</a></li> -->
                 <li><a href="logout.php" class="logout">Logout</a></li>
