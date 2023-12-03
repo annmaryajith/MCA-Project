@@ -4,34 +4,34 @@
     <meta charset="UTF-8">
     <title>PG Owner Dashboard</title>
     <style>
-        body {
+        /* body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
-        }
+        } */
 
         h2 {
-            text-align: center;
+            /* text-align: center; */
             color: #333;
         }
 
-        form {
+        /* form {
             max-width: 400px;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
-        }
+        } */
 
-        label {
+        /* label {
             display: block;
             margin-bottom: 10px;
             color: #333;
-        }
+        } */
 
-        input[type="text"],
+        /* input[type="text"],
         input[type="number"] {
-            width: 100%;
+            width: 50%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
@@ -45,18 +45,17 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-        }
+        } */
 
-        input[type="submit"]:hover {
+        /* input[type="submit"]:hover {
             background-color: #222;
-        }
+        } */
 
         /* Add this CSS to center-align the error message */
         .error {
             color: red;
             font-size: 14px;
         }
-
         body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
@@ -91,25 +90,22 @@
     padding: 20px;
     background-color: #fff;
 }
-
     </style>
 </head>
 <body>
 <div class="container">
         <div class="sidebar">
-            <h2>PG Owner Dashboard</h2>
+            <h2>   PHMS | Owner</h2>
             <ul>
                 <li><a href="pg_owner_dashboard.php">Home</a></li>
-                <li><a href="addpgroom.php">Manage Rooms</a></li>
+                <li><a href="addpgroom.php">Add Rooms</a></li>
+                <li><a href="viewpgroom.php">View room</a></li>
+                <li><a href="pgownerupdate.php">Update profile</a></li>
                 <!-- <li><a href="manage_tenants.php">Manage Tenants</a></li>
                 <li><a href="reports.php">Reports</a></li> -->
                 <li><a href="logout.php" class="logout">Logout</a></li>
             </ul>
         </div>
-        <div class="main-content">
-            <h1>Welcome, PG Owner!</h1>
-        </div>
-    </div>
 
 <?php
 include('conn.php'); // Include your database connection code
@@ -144,16 +140,17 @@ if (isset($_SESSION['username'])) {
 
         // Display Add Room Form
         echo '
+        <div class="main-content">
         <h2>Add Room</h2>
         <form method="post" action="" id="addRoomForm">
     <input type="text" name="room_number" id="room_number" placeholder="Room Number" required>
-    <span id="roomNumberError" class="error"></span>
+    <span id="roomNumberError" class="error"></span><br><br>
 
     <input type="text" name="room_type" id="room_type" placeholder="Room Type" required>
-    <span id="roomTypeError" class="error"></span>
+    <span id="roomTypeError" class="error"></span><br><br>
 
     <input type="number" name="price" id="price" placeholder="Price" required>
-    <span id="priceError" class="error"></span>
+    <span id="priceError" class="error"></span><br><br>
 
     <input type="submit" name="add_room" value="Add Room">
 </form>
@@ -195,6 +192,7 @@ if (isset($_SESSION['username'])) {
         }
     });
 </script>
+</div>
         ';
     } else {
         echo "Pg owner details not found.";
